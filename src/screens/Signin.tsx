@@ -1,9 +1,10 @@
 import { VStack, Heading, Icon, useTheme } from "native-base"
-import colors from "native-base/lib/typescript/theme/base/colors"
 import { Envelope, Key } from 'phosphor-react-native'
 
 import Logo from '../assets/logo_primary.svg'
 import { Input } from "../components/Input"
+
+import { Button } from "../components/Button"
 
 export const SignIn = () => {
 
@@ -29,6 +30,8 @@ export const SignIn = () => {
         InputLeftElement={<Icon as={<Key color={colors.gray[300]} />} ml={4} />}
         secureTextEntry
       />
+
+      <Button title="Entrar" w="full" />
 
     </VStack>
   )
