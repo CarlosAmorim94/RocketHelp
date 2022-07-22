@@ -5,10 +5,18 @@ import Logo from '../assets/logo_primary.svg'
 import { Input } from "../components/Input"
 
 import { Button } from "../components/Button"
+import { useState } from "react"
 
 export const SignIn = () => {
 
   const { colors } = useTheme()
+
+  const [email, setEmail] = useState('teste@gmail.com')
+  const [password, setPassword] = useState('')
+
+  function handleSignIn() {
+    console.log(email, password)
+  }
 
   return (
     <VStack flex={1} alignItems="center" bg="gray.600" px={8} pt={24}>
@@ -22,16 +30,18 @@ export const SignIn = () => {
         placeholder="E-mail"
         mb={4}
         InputLeftElement={<Icon as={<Envelope color={colors.gray[300]} />} ml={4} />}
+        onChangeText={setEmail}
       />
 
       <Input
         placeholder="Senha"
-        mb={4}
+        mb={8}
         InputLeftElement={<Icon as={<Key color={colors.gray[300]} />} ml={4} />}
         secureTextEntry
+        onChangeText={setPassword}
       />
 
-      <Button title="Entrar" w="full" />
+      <Button title="Entrar" w="full" onPress={handleSignIn} />
 
     </VStack>
   )
