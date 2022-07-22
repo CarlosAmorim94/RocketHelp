@@ -44,7 +44,7 @@ export function Order({ data, ...rest }: Props) {
 
         <Circle bg="gray.500" h={12} w={12} mr={5} >
           {
-            data.status === 'open'
+            data.status === 'closed'
               ? <CircleWavyCheck size={24} color={statusColor} /> : <Hourglass size={24} color={statusColor} />
           }
         </Circle>
