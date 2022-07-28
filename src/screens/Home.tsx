@@ -1,27 +1,26 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import auth from '@react-native-firebase/auth'
+import firestore from '@react-native-firebase/firestore'
 import { Alert } from 'react-native';
 import { Center, FlatList, Heading, HStack, IconButton, Text, useTheme, VStack } from 'native-base';
 import { SignOut } from 'phosphor-react-native';
 import { ChatTeardropText } from 'phosphor-react-native'
 
+import { dateFormat } from '../utils/firestoreDateFormat';
+
 import Logo from '../assets/logo_secondary.svg'
+
 import { Button } from '../components/Button';
 import { Filter } from '../components/Filter';
+import { Loading } from '../components/Loading';
 import { Order, OrderProps } from '../components/Order';
 import { useNavigation } from '@react-navigation/native';
 
 export function Home() {
 
+  const [isLoading, setIsLoading] = useState(true)
   const [statusSelected, setStatusSelected] = useState<'open' | 'closed'>('open')
-  const [orders, setOrders] = useState<OrderProps[]>([
-    {
-      id: '123',
-      patrimony: '123456',
-      when: '21/07/2022 às 22:08',
-      status: 'open',
-    },
-  ])
+  const [orders, setOrders] = useState<OrderProps[]>([])
 
   const { colors } = useTheme()
 
@@ -41,6 +40,32 @@ export function Home() {
       return Alert.alert('Logout', 'Não foi possivel sair')
     })
   }
+
+  useEffect(() => {
+    setIsLoading(true)
+
+    const subscriber = firestore()
+      .collection('orders')
+      .where('status', '==', statusSelected)
+      .onSnapshot(snapshot => {
+        const data = snapshot.docs.map(doc => {
+          const { patrimony, description, status, created_at } = doc.data()
+
+          return {
+            id: doc.id,
+            patrimony,
+            description,
+            status,
+            when: dateFormat(created_at)
+          }
+        })
+
+        setOrders(data)
+        setIsLoading(false)
+      })
+
+    return subscriber
+  }, [statusSelected])
 
   return (
     <VStack flex={1} pb={6} bg="gray.700" >
@@ -87,22 +112,25 @@ export function Home() {
           />
         </HStack>
 
-        <FlatList
-          data={orders}
-          keyExtractor={item => item.id}
-          renderItem={({ item }) => <Order data={item} onPress={() => handleOpenDetails(item.id)} />}
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ paddingBottom: 100 }}
-          ListEmptyComponent={() => (
-            <Center>
-              <ChatTeardropText color={colors.gray[300]} size={40} />
-              <Text color="gray.300" fontSize="xl" mt={6} textAlign="center" >
-                Você ainda não possui {'\n'}
-                solicitações {statusSelected === 'open' ? 'em andamento' : 'finalizadas'}
-              </Text>
-            </Center>
-          )}
-        />
+        {
+          isLoading ? <Loading /> :
+            <FlatList
+              data={orders}
+              keyExtractor={item => item.id}
+              renderItem={({ item }) => <Order data={item} onPress={() => handleOpenDetails(item.id)} />}
+              showsVerticalScrollIndicator={false}
+              contentContainerStyle={{ paddingBottom: 100 }}
+              ListEmptyComponent={() => (
+                <Center>
+                  <ChatTeardropText color={colors.gray[300]} size={40} />
+                  <Text color="gray.300" fontSize="xl" mt={6} textAlign="center" >
+                    Você ainda não possui {'\n'}
+                    solicitações {statusSelected === 'open' ? 'em andamento' : 'finalizadas'}
+                  </Text>
+                </Center>
+              )}
+            />
+        }
 
         <Button title="Nova solicitação" onPress={handleNewOrder} />
 
