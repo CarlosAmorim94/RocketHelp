@@ -8,8 +8,10 @@ import { OrderProps } from '../components/Order';
 import { Loading } from '../components/Loading';
 import { OrderFirestoreDTO } from '../DTO/OrderDTO';
 import { dateFormat } from '../utils/firestoreDateFormat';
-import { CircleWavyCheck, Clipboard, DesktopTower, Hourglass, CircleWaveCheck } from 'phosphor-react-native';
+import { CircleWavyCheck, Clipboard, DesktopTower, Hourglass } from 'phosphor-react-native';
 import { CardDetails } from '../components/CardDetails';
+import { Input } from '../components/Input';
+import { Button } from '../components/Button';
 
 
 type RouteParams = {
@@ -79,27 +81,42 @@ export function Details() {
           {order.status === 'closed' ? 'Finalizado' : 'Em andamento'}
         </Text>
 
-        <ScrollView mx={5} showsVerticalScrollIndicator={false} >
-          <CardDetails
-            title="Equipamento"
-            description={`Patrimônio ${order.patrimony}`}
-            icon={DesktopTower}
-            footer={order.when}
-          />
-
-          <CardDetails
-            title="descrição do problema"
-            description={order.description}
-            icon={Clipboard}
-          />
-
-          <CardDetails
-            title="solução"
-            icon={CircleWaveCheck}
-          />
-
-        </ScrollView>
       </HStack>
+
+      <ScrollView mx={5} showsVerticalScrollIndicator={false} >
+        <CardDetails
+          title="Equipamento"
+          description={`Patrimônio ${order.patrimony}`}
+          icon={DesktopTower}
+          footer={order.when}
+        />
+
+        <CardDetails
+          title="descrição do problema"
+          description={order.description}
+          icon={Clipboard}
+        />
+
+        <CardDetails
+          title="solução"
+          icon={CircleWavyCheck}
+          footer={order.closed && `Encerrado em ${order.closed}`}
+        >
+          <Input
+            placeholder="Descrição da solução"
+            onChangeText={setSolution}
+            textAlignVertical="top"
+            multiline
+            h={24}
+          />
+        </CardDetails>
+
+      </ScrollView>
+
+      {
+        order.status === 'open' &&
+        <Button title="Encerrar solicitação" onPress={() => { }} m={5} />
+      }
 
     </VStack>
   );
